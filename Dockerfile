@@ -11,7 +11,7 @@ WORKDIR /home/hcvprod
 RUN chown -R hcvprod /home/hcvprod
 
 RUN apt-get update
-RUN yes | apt-get install pgloader
+RUN yes | apt-get install pgloader postgresql-client
 
 WORKDIR /home/hcvprod
 RUN git clone $CAPPY_CLONE_URL

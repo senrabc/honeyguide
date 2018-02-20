@@ -37,6 +37,13 @@ the database you are loading things into needs to already exist in order for thi
 work. I'm not sure how long this takes or if it is safe to stop.
 ** postgres
 Need to find a way to create databases remotely for the pgloader program
+did it and got the client on the quail container
+#+BEGIN_SRC bash
+psql -h postgres -U postgres -W postgres
+#+END_SRC
+now i need to be able to make this non interactive
+[[https://stackoverflow.com/questions/6523019/postgresql-scripting-psql-execution-with-password][stackoverflow answers that provide options]]
+[[https://www.postgresql.org/docs/current/static/client-authentication.html][postgres authentication]]
 ** redash sql errors on docker-compose up
 When using redash with docker there are multiple sql errors that happen right in a row.
 this can be solved by running 
