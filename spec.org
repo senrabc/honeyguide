@@ -1,0 +1,52 @@
+* scenario
+Joy requires reports run on redi data at a rapid pace. She not only wants raw data but
+also wants some analysis of the data that is also used as a check to make sure that
+what we are doing is reasonable. This is a lot of work and thinking so as much of it as
+possible should be automated.
+* goals
+** Quail running automatically
+This is done in the contianer. It will automatically pull from the redcap project every
+day.
+** Quail databases loaded into postgres
+There is a program called pgloader that is on the quail container. It can be scheduled
+to load data from quail batches into postgres at regular intervals. Both sqlite databases
+should be loaded in simultaneously
+** pg admin
+Not sure if this container will stick around but for now it allows us to look into the
+postgres database very similarly to phpMyAdmin but for postgres.
+** redash integration RDBMS
+Redash is strange with how it works with docker. So much so I am reluctant to integrate
+it totally right now. Eventuaully it will happen but for now there are two docker-compose
+files that correspond to the ETL process and also the redash process.
+** automatic report creation
+This will be part of what redash will do.
+* warts / weird things
+** pgloader
+[[https://github.com/dimitri/pgloader/wiki/Running-in-Docker-(SBCL-warning)][pgloader sbcl error]]
+
+I was able to get this to work with the debian package on stretch.
+#+BEGIN_SRC bash
+
+pgloader --version 
+# 3.3.2
+pgloader sqlite:///home/hcvprod/quailroot/batches/hcvprod/<DATE>/data.db \
+         postgresql://<postgres_user>:<postgres_pass>@postgres/<database_name>
+#+END_SRC
+
+the database you are loading things into needs to already exist in order for this to
+work. I'm not sure how long this takes or if it is safe to stop.
+** postgres
+Need to find a way to create databases remotely for the pgloader program
+** redash sql errors on docker-compose up
+When using redash with docker there are multiple sql errors that happen right in a row.
+this can be solved by running 
+#+BEGIN_SRC bash
+docker exec -it honeyguide_server_1 bash
+#+END_SRC
+on the host machine, and then when in the container
+#+BEGIN_SRC bash
+./manage.py database create_tables
+#+END_SRC
+This behavior is terrible and there is an issue addressing this.
+https://github.com/getredash/redash/issues/2331
+

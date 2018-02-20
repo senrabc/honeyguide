@@ -1,0 +1,38 @@
+version: '3'
+services:
+  quail:
+    env_file: .env
+    image: quail:hcv
+    volumes:
+      - quail_data:/home/hcvprod/quailroot/batches
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        CAPPY_CLONE_URL: ${cappy_clone_url}
+        QUAIL_CLONE_URL: ${quail_clone_url}
+        TOKEN: ${token}
+        REDCAP_URL: ${redcap_url}
+  postgres:
+    image: 'postgres'
+    env_file: .pgenv
+    ports:
+      - 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init_sql:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_PASSWORD: ${pass}
+  pg_admin:
+    image: fenglc/pgadmin4
+    ports:
+      - "5050:5050"
+    environment:
+      DEFAULT_USER: quail
+      DEFAULT_PASSWORD: pass
+    volumes:
+      - pg_admin_data:/var/lib/pgadmin
+volumes:
+  postgres_data:
+  pg_admin_data:
+  quail_data:
