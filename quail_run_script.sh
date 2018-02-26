@@ -1,4 +1,7 @@
 while true; do
+    # Waiting while postgres comes up
+    sleep 5
+
     # # Download the data
     # echo "getting redcap metadata"
     # quail redcap get_meta $1
@@ -27,16 +30,12 @@ while true; do
     sqlite_data=$(printf "sqlite:///home/hcvprod/quailroot/batches/hcvprod/%s/data.db" $current_batch)
     sqlite_metadata=$(printf "sqlite:///home/hcvprod/quailroot/batches/hcvprod/%s/metadata.db" $current_batch)
     postgres_connect=$(printf "postgresql://%s:%s@postgres/%s" $loading_user $random_password $new_database)
-    echo $sqlite_data
-    echo $sqlite_metadata
-    echo $loading_user
-    echo $random_password
-    echo $postgres_connect
     pgloader $sqlite_data $postgres_connect
     pgloader $sqlite_metadata $postgres_connect
 
     #Remove loading user
-    printf "REVOKE ALL ON DATABASE %s FROM %s;\n" $new_database $loading_user > /home/hcvprod/delete_loading_user.sql
+    printf "REVOKE ALL ON DATABASE (SELECT datname FROM pg_database) FROM %s;\n"  $loading_user \
+           > /home/hcvprod/delete_loading_user.sql
     printf "DROP USER %s;\n" $loading_user >> /home/hcvprod/delete_loading_user.sql
     psql -h postgres -U postgres < /home/hcvprod/delete_loading_user.sql
 
