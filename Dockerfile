@@ -12,7 +12,7 @@ WORKDIR /home/hcvprod
 RUN chown -R hcvprod /home/hcvprod
 
 RUN apt-get update
-RUN yes | apt-get install pgloader postgresql-client vim pwgen tr sqlite3
+RUN yes | apt-get install pgloader postgresql-client vim pwgen sqlite3
 
 WORKDIR /home/hcvprod
 RUN git clone $CAPPY_CLONE_URL
