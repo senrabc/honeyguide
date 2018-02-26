@@ -4,6 +4,7 @@ ARG CAPPY_CLONE_URL
 ARG QUAIL_CLONE_URL
 ARG TOKEN
 ARG REDCAP_URL
+ARG PGPASSWORD
 
 RUN useradd hcvprod
 
@@ -11,7 +12,7 @@ WORKDIR /home/hcvprod
 RUN chown -R hcvprod /home/hcvprod
 
 RUN apt-get update
-RUN yes | apt-get install pgloader postgresql-client
+RUN yes | apt-get install pgloader postgresql-client vim pwgen tr sqlite3
 
 WORKDIR /home/hcvprod
 RUN git clone $CAPPY_CLONE_URL
@@ -19,9 +20,12 @@ RUN git clone $QUAIL_CLONE_URL
 
 RUN pip3 install -e ./cappy
 RUN pip3 install -e ./QUAIL
-RUN pip3 install -e ./QUAIL
 
 USER hcvprod
+
+RUN printf "*:*:*:postgres:" > /home/hcvprod/.pgpass
+RUN printf $PGPASSWORD >> /home/hcvprod/.pgpass
+RUN chmod 0600 /home/hcvprod/.pgpass
 
 COPY --chown=hcvprod:hcvprod quail_run_script.sh ./
 

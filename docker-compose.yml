@@ -3,6 +3,9 @@ services:
   quail:
     env_file: .env
     image: quail:hcv
+    # command: sleep 1d
+    depends_on:
+      - postgres
     volumes:
       - quail_data:/home/hcvprod/quailroot/batches
     build:
@@ -13,16 +16,16 @@ services:
         QUAIL_CLONE_URL: ${quail_clone_url}
         TOKEN: ${token}
         REDCAP_URL: ${redcap_url}
+        PGPASSWORD: ${postgres_password}
   postgres:
     image: 'postgres'
-    env_file: .pgenv
     ports:
       - 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init_sql:/docker-entrypoint-initdb.d
     environment:
-      POSTGRES_PASSWORD: ${pass}
+      POSTGRES_PASSWORD: ${postgres_password}
   pg_admin:
     image: fenglc/pgadmin4
     ports:
