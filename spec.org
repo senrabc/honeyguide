@@ -35,6 +35,8 @@ pgloader sqlite:///home/hcvprod/quailroot/batches/hcvprod/<DATE>/data.db \
 
 the database you are loading things into needs to already exist in order for this to
 work. I'm not sure how long this takes or if it is safe to stop.
+
+There is an ephemeral user for the loading of the data into postgres.
 ** postgres
 Need to find a way to create databases remotely for the pgloader program
 did it and got the client on the quail container
@@ -57,3 +59,5 @@ on the host machine, and then when in the container
 This behavior is terrible and there is an issue addressing this.
 https://github.com/getredash/redash/issues/2331
 
+This is fixed by adding the init_sql folder. Postgres will auto load this into its
+database which allows the app to get going right away

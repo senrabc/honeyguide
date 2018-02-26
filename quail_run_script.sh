@@ -2,15 +2,15 @@ while true; do
     # Waiting while postgres comes up
     sleep 5
 
-    # # Download the data
-    # echo "getting redcap metadata"
-    # quail redcap get_meta $1
-    # echo "getting redcap data"
-    # quail redcap get_data $1
-    # echo "generating the redcap metadata database"
-    # quail redcap gen_meta $1
-    # echo "generating the redcap data database"
-    # quail redcap gen_data $1
+    # Download the data
+    echo "getting redcap metadata"
+    quail redcap get_meta $1
+    echo "getting redcap data"
+    quail redcap get_data $1
+    echo "generating the redcap metadata database"
+    quail redcap gen_meta $1
+    echo "generating the redcap data database"
+    quail redcap gen_data $1
 
     # Setup the postgres server to take our new data
     echo "making a new postgres database"
@@ -24,7 +24,7 @@ while true; do
     printf "GRANT ALL ON DATABASE %s TO %s;\n" $new_database $loading_user >> /home/hcvprod/new_database.sql
     psql -h postgres -U postgres < /home/hcvprod/new_database.sql
 
-    # Load data into the postgres databse
+    # Load data into the postgres database
     echo "loading the databases"
     current_batch=$(ls /home/hcvprod/quailroot/batches/hcvprod | sort | tail -n 1)
     sqlite_data=$(printf "sqlite:///home/hcvprod/quailroot/batches/hcvprod/%s/data.db" $current_batch)
@@ -34,7 +34,7 @@ while true; do
     pgloader $sqlite_metadata $postgres_connect
 
     #Remove loading user
-    printf "REVOKE ALL ON DATABASE (SELECT datname FROM pg_database) FROM %s;\n"  $loading_user \
+    printf "REVOKE ALL ON DATABASE %s FROM %s;\n" $new_database $loading_user \
            > /home/hcvprod/delete_loading_user.sql
     printf "DROP USER %s;\n" $loading_user >> /home/hcvprod/delete_loading_user.sql
     psql -h postgres -U postgres < /home/hcvprod/delete_loading_user.sql
