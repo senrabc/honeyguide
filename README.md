@@ -7,8 +7,6 @@ Copy the `fake.env` file and rename it to `.env`.
 Fill in the correct info. If you decide to change the redash password then make sure to change it
 in the connection string as well.
 
-Comment in line 6 in the `docker-compose.yaml`.
-
 Run `docker-compose up --build`
 
 Go to `localhost:8080` and log into redash!
@@ -27,3 +25,8 @@ service in the `docker-compose.yaml` file.
 
 You can add the sqlite databases themselves as a redash datasource because they are mounted in the redash
 container at `/quail_data`
+
+# If a service is killed #
+
+You need to increase the memory limit. There are different ways to do this based on how you are using
+docker so you will have to look this up on your own.

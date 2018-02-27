@@ -3,7 +3,8 @@ services:
   quail:
     env_file: .env
     image: quail:hcv
-    # command: bash /home/hcvprod/quail_run_script.sh hcvprod ${token} ${redcap_url}
+    command: cron -f
+    # command: sleep 1d
     depends_on:
       - postgres
     volumes:
@@ -15,6 +16,9 @@ services:
         CAPPY_CLONE_URL: ${cappy_clone_url}
         QUAIL_CLONE_URL: ${quail_clone_url}
         PGPASSWORD: ${postgres_password}
+    environment:
+      TOKEN: ${token}
+      REDCAP_URL: ${redcap_url}
   postgres:
     image: 'postgres'
     env_file: .env

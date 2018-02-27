@@ -11,7 +11,7 @@ WORKDIR /home/hcvprod
 RUN chown -R hcvprod /home/hcvprod
 
 RUN apt-get update
-RUN yes | apt-get install pgloader postgresql-client vim pwgen sqlite3
+RUN yes | apt-get install pgloader postgresql-client vim pwgen sqlite3 cron
 
 WORKDIR /home/hcvprod
 RUN git clone $CAPPY_CLONE_URL
@@ -37,5 +37,9 @@ RUN chown -R hcvprod:hcvprod ./quailroot
 USER hcvprod
 
 WORKDIR quailroot
+
+RUN (crontab -l ; echo "30 16 * * * bash /home/hcvprod/quail_run_script.sh > /proc/1/fd/1 2>/proc/1/fd/2") \
+    | crontab
+
 
 CMD "echo" "\"Setup complete! QUAIL container ready for docker-compose up!\""
