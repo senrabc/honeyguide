@@ -4,8 +4,10 @@ Make sure you have docker, docker-compose and an internet connection.
 
 Copy the `fake.env` file and rename it to `.env`.
 
-Fill in the correct info. If you decide to change the password for redash in the connection string
-make sure to change in in `/initsql/redash.sql`.
+Fill in the correct info. If you decide to change the redash password then make sure to change it
+in the connection string as well.
+
+Comment in line 6 in the `docker-compose.yaml`.
 
 Run `docker-compose up --build`
 
