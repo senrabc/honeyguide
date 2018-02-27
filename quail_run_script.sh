@@ -1,3 +1,9 @@
+if [ ! -d "/home/hcvprod/quailroot/sources/hcvprod" ]; then
+    printf "No %s project defined, building the project from environment variables." $1 | echo
+    echo "This is stored in a volume on the machine! Remember to clean up!"
+    quail redcap generate quail.conf.yaml $1 $2 $3
+fi
+
 while true; do
     # Waiting while postgres comes up
     sleep 5
@@ -30,13 +36,15 @@ while true; do
     sqlite_data=$(printf "sqlite:///home/hcvprod/quailroot/batches/hcvprod/%s/data.db" $current_batch)
     sqlite_metadata=$(printf "sqlite:///home/hcvprod/quailroot/batches/hcvprod/%s/metadata.db" $current_batch)
     postgres_connect=$(printf "postgresql://%s:%s@postgres/%s" $loading_user $random_password $new_database)
+    metadata_path=$(printf "/home/hcvprod/quailroot/batches/hcvprod/%s/metadata.db" $current_batch)
+    sqlite3 $metdata_path < /home/hcvprod/fix_quail_unique_field.sql
     pgloader $sqlite_data $postgres_connect
     pgloader $sqlite_metadata $postgres_connect
 
     #Remove loading user
-    printf "REVOKE ALL ON DATABASE %s FROM %s;\n" $new_database $loading_user \
-           > /home/hcvprod/delete_loading_user.sql
-    printf "DROP USER %s;\n" $loading_user >> /home/hcvprod/delete_loading_user.sql
+    echo "REASSIGN OWNED BY pgloader TO postgres;" > /home/hcvprod/delete_loading_user.sql
+    echo "DROP OWNED BY pgloader;" >> /home/hcvprod/delete_loading_user.sql
+    echo "DROP ROLE pgloader;" >> /home/hcvprod/delete_loading_user.sql
     psql -h postgres -U postgres < /home/hcvprod/delete_loading_user.sql
 
 

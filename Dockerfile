@@ -1,9 +1,8 @@
+# NOTE this image is not meant to be run on it's own. Please use docker-compose
 FROM python:3-stretch
 
 ARG CAPPY_CLONE_URL
 ARG QUAIL_CLONE_URL
-ARG TOKEN
-ARG REDCAP_URL
 ARG PGPASSWORD
 
 RUN useradd hcvprod
@@ -27,12 +26,16 @@ RUN printf "*:*:*:postgres:" > /home/hcvprod/.pgpass
 RUN printf $PGPASSWORD >> /home/hcvprod/.pgpass
 RUN chmod 0600 /home/hcvprod/.pgpass
 
-COPY --chown=hcvprod:hcvprod quail_run_script.sh ./
+COPY --chown=hcvprod:hcvprod quail_run_script.sh fix_quail_unique_field.sql ./
 
 RUN quail install quailroot
 
+USER root
+
+RUN chown -R hcvprod:hcvprod ./quailroot
+
+USER hcvprod
+
 WORKDIR quailroot
 
-RUN quail redcap generate quail.conf.yaml hcvprod $TOKEN $REDCAP_URL
-
-CMD "bash" "/home/hcvprod/quail_run_script.sh" "hcvprod"
+CMD "echo" "\"Setup complete! QUAIL container ready for docker-compose up!\""

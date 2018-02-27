@@ -3,6 +3,7 @@ services:
   quail:
     env_file: .env
     image: quail:hcv
+    # command: bash /home/hcvprod/quail_run_script.sh hcvprod ${token} ${redcap_url}
     depends_on:
       - postgres
     volumes:
@@ -13,8 +14,6 @@ services:
       args:
         CAPPY_CLONE_URL: ${cappy_clone_url}
         QUAIL_CLONE_URL: ${quail_clone_url}
-        TOKEN: ${token}
-        REDCAP_URL: ${redcap_url}
         PGPASSWORD: ${postgres_password}
   postgres:
     image: 'postgres'
@@ -26,6 +25,7 @@ services:
       - ./init_sql:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_PASSWORD: ${postgres_password}
+      REDASH_PASSWORD: ${redash_password}
   pg_admin:
     image: fenglc/pgadmin4
     ports:

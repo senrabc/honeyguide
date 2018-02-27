@@ -5,19 +5,21 @@ what we are doing is reasonable. This is a lot of work and thinking so as much o
 possible should be automated.
 * goals
 ** Quail running automatically
-This is done in the contianer. It will automatically pull from the redcap project every
+This is done in the container. It will automatically pull from the redcap project every
 day.
 ** Quail databases loaded into postgres
 There is a program called pgloader that is on the quail container. It can be scheduled
 to load data from quail batches into postgres at regular intervals. Both sqlite databases
-should be loaded in simultaneously
+should be loaded in sequentially. 
+TODO: There is a bug where quail metadata does not load properly. It is fixed in the run script
+but a better fix is to fix the QUAIL program itself.
 ** pg admin
 Not sure if this container will stick around but for now it allows us to look into the
 postgres database very similarly to phpMyAdmin but for postgres.
 ** redash integration RDBMS
-Redash is strange with how it works with docker. So much so I am reluctant to integrate
-it totally right now. Eventuaully it will happen but for now there are two docker-compose
-files that correspond to the ETL process and also the redash process.
+Redash is able to access the postgres container and database but there is no autommatic
+process to add new databases from particular dates automatically. There should be another
+container that can do things like manage the redash data.
 ** automatic report creation
 This will be part of what redash will do.
 * warts / weird things
