@@ -30,3 +30,8 @@ container at `/quail_data`
 
 You need to increase the memory limit. There are different ways to do this based on how you are using
 docker so you will have to look this up on your own.
+
+# Running a pull without cron #
+
+There is a script that can be run from the docker host once the containers are running that will
+allow one to pull whenever they want.

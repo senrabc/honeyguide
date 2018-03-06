@@ -1,13 +1,12 @@
-echo $(whoami)
+cd /home/hcvprod/quailroot
+echo $(whoami) $(pwd)
 
 if [ ! -d "/home/hcvprod/quailroot/sources/hcvprod" ]; then
     printf "No %s project defined, building the project from environment variables." hcvprod | echo
     echo "This is stored in a volume on the machine! Remember to clean up!"
     quail redcap generate quail.conf.yaml hcvprod $TOKEN $REDCAP_URL
+    echo "Done adding the quail redcap source"
 fi
-
-# Waiting while postgres comes up
-sleep 5
 
 # Download the data
 echo "getting redcap metadata"
@@ -20,6 +19,7 @@ echo "generating the redcap data database"
 quail redcap gen_data hcvprod
 
 # Setup the postgres server to take our new data
+cd /home/hcvprod
 echo "making a new postgres database"
 printf "CREATE DATABASE " > /home/hcvprod/new_database.sql
 new_database=$(date | sed -e 's/[ :]/_/g' | tr '[:upper:]' '[:lower:]')

@@ -22,9 +22,7 @@ RUN pip3 install -e ./QUAIL
 ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN quail install quailroot
-
-# minute hour
+# remember the hour ranges from 0-23 hours
 ARG MINUTE
 ARG HOUR
 RUN printf "%s %s * * * bash /home/hcvprod/quail_user_script.sh > /proc/1/fd/1 2> /proc/1/fd/2\n" $MINUTE $HOUR \
@@ -32,8 +30,9 @@ RUN printf "%s %s * * * bash /home/hcvprod/quail_user_script.sh > /proc/1/fd/1 2
 
 USER hcvprod
 
-RUN printf "*:*:*:postgres:" > /home/hcvprod/.pgpass
-RUN printf $PGPASSWORD >> /home/hcvprod/.pgpass
+RUN quail install quailroot
+
+RUN printf "*:*:*:postgres:%s" $PGPASSWORD > /home/hcvprod/.pgpass
 RUN chmod 0600 /home/hcvprod/.pgpass
 
 COPY --chown=hcvprod:hcvprod quail_user_script.sh quail_run_script.sh fix_quail_unique_field.sql ./

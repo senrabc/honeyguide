@@ -1,48 +1,61 @@
+# Its important to understand the distinction from
+# build time and run time for an image and container respectively.
+# The only image we build in this file is the quail image.
+#
+# All variables in the .env file are exposed to this docker-compose.yaml
+# at when running 'docker-compose up'. You can see how the file looks when
+# it has all variable substitutions done with 'docker-compose config'.
+# The only variables that persist to runtime are those in the environment
+# block for each service.
+
 version: '3'
 services:
   quail:
-    env_file: .env
     image: quail:hcv
     command: cron -f
     depends_on:
       - postgres
     volumes:
-      - quail_data:/home/hcvprod/quailroot/batches
+      - quail_data:/home/hcvprod/quailroot
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        CAPPY_CLONE_URL: ${cappy_clone_url}
-        QUAIL_CLONE_URL: ${quail_clone_url}
-        PGPASSWORD: ${postgres_password}
-        MINUTE: ${minute}
-        HOUR: ${hour}
+        CAPPY_CLONE_URL: ${PIP_CAPPY_CLONE_URL}
+        QUAIL_CLONE_URL: ${PIP_QUAIL_CLONE_URL}
+        PGPASSWORD: ${POSTGRES_PASSWORD}
+        MINUTE: ${QUAIL_MINUTE}
+        HOUR: ${QUAIL_HOUR}
     environment:
-      TOKEN: ${token}
-      REDCAP_URL: ${redcap_url}
+      TOKEN: ${QUAIL_TOKEN}
+      REDCAP_URL: ${QUAIL_REDCAP_URL}
+    restart: always
+
   postgres:
     image: 'postgres'
-    env_file: .env
     ports:
       - 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init_sql:/docker-entrypoint-initdb.d
     environment:
-      POSTGRES_PASSWORD: ${postgres_password}
-      REDASH_PASSWORD: ${redash_password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDASH_PASSWORD: ${REDASH_PASSWORD}
+    restart: always
+
   pg_admin:
     image: fenglc/pgadmin4
     ports:
       - "5050:5050"
     environment:
-      DEFAULT_USER: quail
-      DEFAULT_PASSWORD: pass
+      DEFAULT_USER: ${PG_ADMIN_DEFAULT_USER}
+      DEFAULT_PASSWORD: ${PG_ADMIN_DEFAULT_PASS} 
     volumes:
       - pg_admin_data:/var/lib/pgadmin
       - ./init_sql:/docker-entrypoint-initdb.d/
+    restart: always
+
   redash:
-    env_file: .env
     image: redash/redash:latest
     volumes:
       - quail_data:/hcvprod
@@ -56,27 +69,29 @@ services:
       PYTHONUNBUFFERED: 0
       REDASH_LOG_LEVEL: "INFO"
       REDASH_REDIS_URL: "redis://redis:6379/0"
-      REDASH_DATABASE_URL: ${redash_database_url}
-      REDASH_COOKIE_SECRET: veryverysecret
+      REDASH_DATABASE_URL: ${REDASH_DATABASE_URL}
+      REDASH_COOKIE_SECRET: ${REDASH_COOKIE_SECRET}
       REDASH_WEB_WORKERS: 4
     restart: always
+
   worker:
-    env_file: .env
     image: redash/redash:latest
     command: scheduler
     environment:
       PYTHONUNBUFFERED: 0
       REDASH_LOG_LEVEL: "INFO"
       REDASH_REDIS_URL: "redis://redis:6379/0"
-      REDASH_DATABASE_URL: ${redash_database_url}
+      REDASH_DATABASE_URL: ${REDASH_DATABASE_URL}
       QUEUES: "queries,scheduled_queries,celery"
       WORKERS_COUNT: 2
     restart: always
+
   redis:
     image: redis:3.0-alpine
     restart: always
     volumes:
       - redis_data:/data
+
   nginx:
     image: redash/nginx:latest
     ports:
