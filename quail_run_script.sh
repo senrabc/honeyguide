@@ -1,3 +1,5 @@
+echo $(whoami)
+
 if [ ! -d "/home/hcvprod/quailroot/sources/hcvprod" ]; then
     printf "No %s project defined, building the project from environment variables." hcvprod | echo
     echo "This is stored in a volume on the machine! Remember to clean up!"

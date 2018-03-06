@@ -9,7 +9,6 @@ RUN apt-get update
 RUN yes | apt-get install pgloader postgresql-client vim pwgen sqlite3 cron
 
 RUN useradd hcvprod
-RUN usermod -a -G crontab hcvprod
 
 WORKDIR /home/hcvprod
 RUN chown -R hcvprod /home/hcvprod
@@ -20,24 +19,25 @@ RUN git clone $QUAIL_CLONE_URL
 RUN pip3 install -e ./cappy
 RUN pip3 install -e ./QUAIL
 
-# RUN echo "TZ='America/New_York'; export TZ" > /etc/profile.d/timezone.sh
+ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN quail install quailroot
 
-RUN chown -R hcvprod:hcvprod ./quailroot
-
-RUN chmod 0600 /etc/crontab
+# minute hour
+ARG MINUTE
+ARG HOUR
+RUN printf "%s %s * * * bash /home/hcvprod/quail_user_script.sh > /proc/1/fd/1 2> /proc/1/fd/2\n" $MINUTE $HOUR \
+    | crontab
 
 USER hcvprod
-
-RUN echo "53 22 * * * bash /home/hcvprod/quail_run_script.sh > /proc/1/fd/1 2> /proc/1/fd/2" | crontab
 
 RUN printf "*:*:*:postgres:" > /home/hcvprod/.pgpass
 RUN printf $PGPASSWORD >> /home/hcvprod/.pgpass
 RUN chmod 0600 /home/hcvprod/.pgpass
 
-COPY --chown=hcvprod:hcvprod quail_run_script.sh fix_quail_unique_field.sql ./
+COPY --chown=hcvprod:hcvprod quail_user_script.sh quail_run_script.sh fix_quail_unique_field.sql ./
 
 USER root
 
-CMD "echo" "\"Setup complete! QUAIL container ready for docker-compose up!\""
+CMD "cron" "-f"

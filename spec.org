@@ -7,6 +7,23 @@ possible should be automated.
 ** Quail running automatically
 This is done in the container. It will automatically pull from the redcap project every
 day.
+*** CRON start
+We run cron in the foreground with the `cron -f` command. You can set the time it will run
+by changing the minute and hour environment variables in the .env file.
+The following is the relevant section in the Dockerfile 
+#+BEGIN_SRC docker
+ARG MINUTE
+ARG HOUR
+RUN printf "%s %s * * * bash /home/hcvprod/quail_user_script.sh > /proc/1/fd/1 2> /proc/1/fd/2\n" $MINUTE $HOUR \
+    | crontab
+#+END_SRC
+Note that you could add more variables to set more parts of the cron if desired.
+*** Timezone
+This sets the timezone in the container to make the cron run at the right time
+#+BEGIN_SRC docker
+ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+#+END_SRC
 ** Quail databases loaded into postgres
 There is a program called pgloader that is on the quail container. It can be scheduled
 to load data from quail batches into postgres at regular intervals. Both sqlite databases
@@ -48,6 +65,8 @@ psql -h postgres -U postgres -W postgres
 now i need to be able to make this non interactive
 [[https://stackoverflow.com/questions/6523019/postgresql-scripting-psql-execution-with-password][stackoverflow answers that provide options]]
 [[https://www.postgresql.org/docs/current/static/client-authentication.html][postgres authentication]]
+
+we do this with the ~/.pgpass file
 ** redash sql errors on docker-compose up
 When using redash with docker there are multiple sql errors that happen right in a row.
 this can be solved by running 
