@@ -1,3 +1,8 @@
+# Purpose #
+
+Honeyguide is a project meant to assist the HCV Target team with data analysis using QUAIL to pull
+data and redash as the front end.
+
 # Getting started #
 
 Make sure you have docker, docker-compose and an internet connection.
