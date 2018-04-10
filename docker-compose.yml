@@ -101,6 +101,16 @@ services:
     links:
       - redash:redash
     restart: always
+  mysql-server:
+    image: mysql
+    restart: always
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    environment:
+      - "MYSQL_DATABASE=malignant"
+      - "MYSQL_ROOT_PASSWORD=password"
+    ports:
+      - "3306:3306"
 volumes:
   postgres_data:
   pg_admin_data:
