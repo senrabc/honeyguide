@@ -106,6 +106,7 @@ services:
     restart: always
     volumes:
       - ./db:/docker-entrypoint-initdb.d
+      - ./mysql_conf.d:/etc/mysql/conf.d
     environment:
       MYSQL_DATABASE: ${MYSQL_DB_NAME}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
