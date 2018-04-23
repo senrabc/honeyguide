@@ -18,6 +18,8 @@ RUN printf "%s %s * * * bash /home/hcvprod/quail_user_script.sh > /proc/1/fd/1 2
     | crontab
 #+END_SRC
 Note that you could add more variables to set more parts of the cron if desired.
+Note that environment variables and cron starting in the foreground is a whole thing and
+you should check the environment variables in cronjob heading
 *** Timezone
 This sets the timezone in the container to make the cron run at the right time
 #+BEGIN_SRC docker
@@ -39,6 +41,13 @@ process to add new databases from particular dates automatically. There should b
 container that can do things like manage the redash data.
 ** automatic report creation
 This will be part of what redash will do.
+** environment variables in cronjob
+[[https://stackoverflow.com/questions/27771781/how-can-i-access-docker-set-environment-variables-from-a-cron-job?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa][answer from stack overflow]]
+Basically, cron doesnt inherit the environment variables by
+default so you need to utilize the cron pam module, whose existance
+can be verified by looking for /etc/pam.d, and writing an
+entrypoint script that writes the environment to `/etc/environment`
+
 * warts / weird things
 ** pgloader
 [[https://github.com/dimitri/pgloader/wiki/Running-in-Docker-(SBCL-warning)][pgloader sbcl error]]

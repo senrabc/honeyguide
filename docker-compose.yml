@@ -12,7 +12,7 @@ version: '3'
 services:
   quail:
     image: quail:hcv
-    command: cron -f
+    command: bash -c "printenv > /etc/environment ; cron -f"
     depends_on:
       - postgres
     volumes:
