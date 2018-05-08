@@ -5,6 +5,14 @@ data and redash as the front end.
 
 # Getting started #
 
+
+## pre reqs ##
+
+you need:
+ 1. docker (mac $ brew install docker)
+ 2. compose (mac $ brew install docker-compose)
+
+
 Make sure you have docker, docker-compose and an internet connection.
 
 Copy the `fake.env` file and rename it to `.env`.
