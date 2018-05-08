@@ -49,7 +49,7 @@ services:
       - "5050:5050"
     environment:
       DEFAULT_USER: ${PG_ADMIN_DEFAULT_USER}
-      DEFAULT_PASSWORD: ${PG_ADMIN_DEFAULT_PASS} 
+      DEFAULT_PASSWORD: ${PG_ADMIN_DEFAULT_PASS}
     volumes:
       - pg_admin_data:/var/lib/pgadmin
       - ./init_sql:/docker-entrypoint-initdb.d/
@@ -101,6 +101,17 @@ services:
     links:
       - redash:redash
     restart: always
+  mysql-server:
+    image: mysql
+    restart: always
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+      - ./mysql_conf.d:/etc/mysql/conf.d
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
 volumes:
   postgres_data:
   pg_admin_data:
