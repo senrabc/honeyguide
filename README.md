@@ -11,7 +11,9 @@ data and redash as the front end.
 you need:
  1. docker (mac $ brew install docker)
  2. compose (mac $ brew install docker-compose)
-
+ 3. docker app (mac $ brew cask install docker)
+ 4. Start docker app manually. 
+ 5. increase memory to ~8gb or more
 
 Make sure you have docker, docker-compose and an internet connection.
 
